@@ -1,8 +1,8 @@
 /* Box2D helloworld.cpp combined with SFML */
-
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
+
 static const float SCALE = 10.0; //10px = 1 meter
 static const float WWIDTH= 800.0; //screen width
 static const float WHEIGHT= 600.0; //screen width
@@ -16,8 +16,8 @@ b2Vec2 convertWorldToScreen( const b2Vec2& v) {
 // box.
 int main(int argc, char** argv)
 {
-  //Setup sfml
-  sf::RenderWindow window( sf::VideoMode( WWIDTH,WHEIGHT), "Det fonkar");
+  //Setup SFML
+  sf::RenderWindow window( sf::VideoMode( WWIDTH,WHEIGHT), "It really is Box2D");
 
   B2_NOT_USED(argc);
   B2_NOT_USED(argv);
@@ -27,16 +27,16 @@ int main(int argc, char** argv)
   sf::Texture BoxTexture;
   GroundTexture.loadFromFile("grass.png");
   BoxTexture.loadFromFile("wood.png");
-  // SPriteS
+  // Sprites
   sf::Sprite GroundSprite;
   sf::Sprite BodySprite;
   GroundSprite.setTexture(GroundTexture);
-  //GroundSprite.setOrigin(0.f, 0.f);
   GroundSprite.setTextureRect(sf::IntRect(0, 0, 10 * SCALE, 2 * SCALE));
-  GroundSprite.setOrigin(5 * SCALE, 1 * SCALE);
+  GroundSprite.setOrigin(5 * SCALE, 1 * SCALE); // origin in middle
+
   BodySprite.setTexture( BoxTexture);
   BodySprite.setTextureRect(sf::IntRect(0, 0, 2 * SCALE, 2 * SCALE));
-  BodySprite.setOrigin( 1 * SCALE, 1 * SCALE);
+  BodySprite.setOrigin( 1 * SCALE, 1 * SCALE); //origin in middle
 
   // Define the gravity vector.
   b2Vec2 gravity(0.0f, -1.0f);
@@ -68,8 +68,7 @@ int main(int argc, char** argv)
   bodyDef.type = b2_dynamicBody;
   bodyDef.position.Set(3.0f, 8.0f);
   b2Body* body = world.CreateBody(&bodyDef);
-  //body->SetAngularVelocity( 1.2);
-  body->SetTransform( body->GetPosition(), 1.2);
+  body->SetTransform( body->GetPosition(), 1.2); //rotate
 
   // Define another box shape for our dynamic body.
   b2PolygonShape dynamicBox;
@@ -96,9 +95,9 @@ int main(int argc, char** argv)
   int32 positionIterations = 2;
 
   // This is our little game loop.
-  //for (int32 i = 0; i < 60; ++i)
   while (window.isOpen())
   {
+    // Check if it's time to go
     sf::Event event;
     while (window.pollEvent( event))
     {
@@ -110,20 +109,17 @@ int main(int argc, char** argv)
     // It is generally best to keep the time step and iterations fixed.
     world.Step(timeStep, velocityIterations, positionIterations);
 
-    // Now print the position and angle of the body.
+    // Draw it
+    // get the position and angle of the body
     b2Vec2 pos = body->GetPosition();
     float32 angle = body->GetAngle();
-    //std::cout<<pos.x<<"x"<<pos.y<<std::endl;
     pos = convertWorldToScreen( pos);
-
-    //RENDER
-    //printf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
 
     BodySprite.setPosition(pos.x, pos.y);
     BodySprite.setRotation(180/b2_pi * angle);
     window.draw(BodySprite);
-    //std::cout<<pos.x<<" "<<pos.y<<std::endl;
 
+    // get the position and angle of the ground
     pos = groundBody->GetPosition();
     angle = groundBody->GetAngle();
     pos = convertWorldToScreen( pos);
@@ -131,7 +127,6 @@ int main(int argc, char** argv)
     GroundSprite.setPosition(pos.x, pos.y);
     GroundSprite.setRotation(180/b2_pi * angle);
     window.draw(GroundSprite);
-
 
 
     window.display();
